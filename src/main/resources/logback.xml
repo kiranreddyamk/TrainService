@@ -1,33 +1,48 @@
 <configuration>
-	<timestamp key="byDay" datePattern="yyyyMMdd'T'HHmmss" />
 
 	<appender name="STDOUT"
 		class="ch.qos.logback.core.ConsoleAppender">
+		<target>System.out</target>
 		<encoder>
 			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
 			</pattern>
 		</encoder>
 	</appender>
 
-	<appender name="FILE" class="ch.qos.logback.core.FileAppender">
-		<file> log-${byDay}.txt </file>
-		<append>true</append>
+	<appender name="STDERR"
+		class="ch.qos.logback.core.ConsoleAppender">
+		<target>System.err</target>
 		<encoder>
-			<!--  <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n 
-			</pattern> -->
 			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
 			</pattern>
 		</encoder>
 	</appender>
 
-	<root level="debug">
-		<appender-ref ref="FILE" />
-		<appender-ref ref="STDOUT" />
-	</root>
+	<appender name="fast-kafka-appender"
+		class="com.github.danielwegener.logback.kafka.KafkaAppender">
+		<encoder
+			class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+			</pattern>
+		</encoder>
+
+		<topic>fast-logs</topic>
+		<keyingStrategy
+			class="com.github.danielwegener.logback.kafka.keying.NoKeyKeyingStrategy" />
+		<deliveryStrategy
+			class="com.github.danielwegener.logback.kafka.delivery.AsynchronousDeliveryStrategy" />
+
+		<producerConfig>bootstrap.servers=localhost:9092</producerConfig>
+		<producerConfig>acks=0</producerConfig>
+		<producerConfig>linger.ms=100</producerConfig>
+		<producerConfig>max.block.ms=100</producerConfig>
+		<producerConfig>client.id=${HOSTNAME}-${CONTEXT_NAME}-logback-relaxed
+		</producerConfig>
+
+	</appender>
 
 	<root level="info">
-		<appender-ref ref="FILE" />
+		<appender-ref ref="fast-kafka-appender" />
 		<appender-ref ref="STDOUT" />
 	</root>
-
 </configuration>
