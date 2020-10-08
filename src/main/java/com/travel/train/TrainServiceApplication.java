@@ -9,7 +9,7 @@ public class TrainServiceApplication {
 	public static void main(String[] args) throws InterruptedException {
 		SpringApplication.run(TrainServiceApplication.class, args);
 		Timer timer = new Timer();
-		timer.log();
+		timer.demoLog();
 	}
 
 }
